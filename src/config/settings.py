@@ -108,7 +108,10 @@ class Settings(BaseSettings):
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
 
     # CORS settings
-    CORS_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", "*").split(",")
+    CORS_ORIGINS: List[str] = os.getenv(
+        "CORS_ORIGINS", 
+        "https://falai.3du.space,http://localhost:3200,http://localhost:3000"
+    ).split(",")
 
     # Token settings
     TOKEN_EXPIRY_HOURS: int = int(
