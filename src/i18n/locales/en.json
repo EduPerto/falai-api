@@ -1,0 +1,130 @@
+{
+  "common": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information",
+    "created": "Created successfully",
+    "updated": "Updated successfully",
+    "deleted": "Deleted successfully",
+    "not_found": "Not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "validation_error": "Validation error",
+    "internal_error": "Internal server error"
+  },
+  "auth": {
+    "login": {
+      "success": "Login successful",
+      "failed": "Invalid credentials",
+      "account_locked": "Account locked due to too many failed attempts",
+      "invalid_email": "Invalid email format",
+      "required_fields": "Email and password are required"
+    },
+    "register": {
+      "success": "Registration successful. Please check your email to verify your account.",
+      "email_exists": "Email already registered",
+      "weak_password": "Password must be at least 8 characters",
+      "verification_sent": "Verification email sent"
+    },
+    "logout": {
+      "success": "Logout successful"
+    },
+    "token": {
+      "invalid": "Invalid or expired token",
+      "expired": "Token has expired",
+      "missing": "Authentication token is required"
+    },
+    "password": {
+      "reset_requested": "Password reset email sent",
+      "reset_success": "Password reset successful",
+      "change_success": "Password changed successfully",
+      "mismatch": "Passwords do not match"
+    }
+  },
+  "agents": {
+    "created": "Agent created successfully",
+    "updated": "Agent updated successfully",
+    "deleted": "Agent deleted successfully",
+    "not_found": "Agent not found",
+    "list_empty": "No agents found",
+    "execution": {
+      "started": "Agent execution started",
+      "completed": "Agent execution completed",
+      "failed": "Agent execution failed: {error}",
+      "invalid_type": "Invalid agent type"
+    },
+    "tools": {
+      "added": "Tool added to agent",
+      "removed": "Tool removed from agent",
+      "not_found": "Tool not found"
+    }
+  },
+  "clients": {
+    "created": "Client created successfully",
+    "updated": "Client updated successfully",
+    "deleted": "Client deleted successfully",
+    "not_found": "Client not found",
+    "api_key": {
+      "created": "API key created successfully",
+      "revoked": "API key revoked successfully",
+      "invalid": "Invalid API key"
+    }
+  },
+  "chat": {
+    "message_sent": "Message sent successfully",
+    "message_received": "Message received",
+    "session_started": "Chat session started",
+    "session_ended": "Chat session ended",
+    "session_not_found": "Session not found",
+    "invalid_message": "Invalid message format"
+  },
+  "mcp": {
+    "server": {
+      "created": "MCP server created successfully",
+      "updated": "MCP server updated successfully",
+      "deleted": "MCP server deleted successfully",
+      "not_found": "MCP server not found",
+      "connection_failed": "Failed to connect to MCP server"
+    },
+    "tool": {
+      "created": "Tool created successfully",
+      "updated": "Tool updated successfully",
+      "deleted": "Tool deleted successfully",
+      "not_found": "Tool not found",
+      "execution_failed": "Tool execution failed: {error}"
+    }
+  },
+  "admin": {
+    "permission_denied": "Admin permission required",
+    "action_success": "Admin action completed successfully",
+    "user_created": "User created successfully",
+    "user_updated": "User updated successfully",
+    "user_deleted": "User deleted successfully"
+  },
+  "validation": {
+    "required_field": "Field '{field}' is required",
+    "invalid_format": "Invalid format for field '{field}'",
+    "min_length": "Field '{field}' must be at least {min} characters",
+    "max_length": "Field '{field}' must not exceed {max} characters",
+    "invalid_email": "Invalid email address",
+    "invalid_url": "Invalid URL format"
+  },
+  "email": {
+    "welcome": {
+      "subject": "Welcome to Evo AI",
+      "greeting": "Hello {name}",
+      "message": "Thank you for registering with Evo AI. Please verify your email address to get started."
+    },
+    "verification": {
+      "subject": "Verify Your Email Address",
+      "action": "Verify Email",
+      "message": "Please click the button below to verify your email address."
+    },
+    "password_reset": {
+      "subject": "Password Reset Request",
+      "action": "Reset Password",
+      "message": "You requested a password reset. Click the button below to reset your password."
+    }
+  }
+}

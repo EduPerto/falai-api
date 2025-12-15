@@ -1,0 +1,130 @@
+{
+  "common": {
+    "success": "Sucesso",
+    "error": "Erro",
+    "warning": "Aviso",
+    "info": "Informação",
+    "created": "Criado com sucesso",
+    "updated": "Atualizado com sucesso",
+    "deleted": "Excluído com sucesso",
+    "not_found": "Não encontrado",
+    "unauthorized": "Não autorizado",
+    "forbidden": "Acesso negado",
+    "validation_error": "Erro de validação",
+    "internal_error": "Erro interno do servidor"
+  },
+  "auth": {
+    "login": {
+      "success": "Login realizado com sucesso",
+      "failed": "Credenciais inválidas",
+      "account_locked": "Conta bloqueada devido a muitas tentativas de login",
+      "invalid_email": "Formato de email inválido",
+      "required_fields": "Email e senha são obrigatórios"
+    },
+    "register": {
+      "success": "Cadastro realizado com sucesso. Por favor, verifique seu email para ativar sua conta.",
+      "email_exists": "Email já cadastrado",
+      "weak_password": "A senha deve ter pelo menos 8 caracteres",
+      "verification_sent": "Email de verificação enviado"
+    },
+    "logout": {
+      "success": "Logout realizado com sucesso"
+    },
+    "token": {
+      "invalid": "Token inválido ou expirado",
+      "expired": "Token expirado",
+      "missing": "Token de autenticação é obrigatório"
+    },
+    "password": {
+      "reset_requested": "Email de redefinição de senha enviado",
+      "reset_success": "Senha redefinida com sucesso",
+      "change_success": "Senha alterada com sucesso",
+      "mismatch": "As senhas não coincidem"
+    }
+  },
+  "agents": {
+    "created": "Agente criado com sucesso",
+    "updated": "Agente atualizado com sucesso",
+    "deleted": "Agente excluído com sucesso",
+    "not_found": "Agente não encontrado",
+    "list_empty": "Nenhum agente encontrado",
+    "execution": {
+      "started": "Execução do agente iniciada",
+      "completed": "Execução do agente concluída",
+      "failed": "Execução do agente falhou: {error}",
+      "invalid_type": "Tipo de agente inválido"
+    },
+    "tools": {
+      "added": "Ferramenta adicionada ao agente",
+      "removed": "Ferramenta removida do agente",
+      "not_found": "Ferramenta não encontrada"
+    }
+  },
+  "clients": {
+    "created": "Cliente criado com sucesso",
+    "updated": "Cliente atualizado com sucesso",
+    "deleted": "Cliente excluído com sucesso",
+    "not_found": "Cliente não encontrado",
+    "api_key": {
+      "created": "Chave de API criada com sucesso",
+      "revoked": "Chave de API revogada com sucesso",
+      "invalid": "Chave de API inválida"
+    }
+  },
+  "chat": {
+    "message_sent": "Mensagem enviada com sucesso",
+    "message_received": "Mensagem recebida",
+    "session_started": "Sessão de chat iniciada",
+    "session_ended": "Sessão de chat encerrada",
+    "session_not_found": "Sessão não encontrada",
+    "invalid_message": "Formato de mensagem inválido"
+  },
+  "mcp": {
+    "server": {
+      "created": "Servidor MCP criado com sucesso",
+      "updated": "Servidor MCP atualizado com sucesso",
+      "deleted": "Servidor MCP excluído com sucesso",
+      "not_found": "Servidor MCP não encontrado",
+      "connection_failed": "Falha ao conectar ao servidor MCP"
+    },
+    "tool": {
+      "created": "Ferramenta criada com sucesso",
+      "updated": "Ferramenta atualizada com sucesso",
+      "deleted": "Ferramenta excluída com sucesso",
+      "not_found": "Ferramenta não encontrada",
+      "execution_failed": "Execução da ferramenta falhou: {error}"
+    }
+  },
+  "admin": {
+    "permission_denied": "Permissão de administrador necessária",
+    "action_success": "Ação administrativa concluída com sucesso",
+    "user_created": "Usuário criado com sucesso",
+    "user_updated": "Usuário atualizado com sucesso",
+    "user_deleted": "Usuário excluído com sucesso"
+  },
+  "validation": {
+    "required_field": "Campo '{field}' é obrigatório",
+    "invalid_format": "Formato inválido para o campo '{field}'",
+    "min_length": "Campo '{field}' deve ter pelo menos {min} caracteres",
+    "max_length": "Campo '{field}' não pode exceder {max} caracteres",
+    "invalid_email": "Endereço de email inválido",
+    "invalid_url": "Formato de URL inválido"
+  },
+  "email": {
+    "welcome": {
+      "subject": "Bem-vindo ao Evo AI",
+      "greeting": "Olá {name}",
+      "message": "Obrigado por se cadastrar no Evo AI. Por favor, verifique seu endereço de email para começar."
+    },
+    "verification": {
+      "subject": "Verifique Seu Endereço de Email",
+      "action": "Verificar Email",
+      "message": "Por favor, clique no botão abaixo para verificar seu endereço de email."
+    },
+    "password_reset": {
+      "subject": "Solicitação de Redefinição de Senha",
+      "action": "Redefinir Senha",
+      "message": "Você solicitou a redefinição de senha. Clique no botão abaixo para redefinir sua senha."
+    }
+  }
+}
