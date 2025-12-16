@@ -109,8 +109,8 @@ class Settings(BaseSettings):
 
     # CORS settings
     CORS_ORIGINS: List[str] = os.getenv(
-        "CORS_ORIGINS", 
-        "https://falai.3du.space,http://localhost:3200,http://localhost:3000"
+        "CORS_ORIGINS",
+        "https://falai.space,http://localhost:3200,http://localhost:3000"
     ).split(",")
 
     # Token settings
