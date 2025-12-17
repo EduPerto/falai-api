@@ -2,12 +2,20 @@
 # Optimized for production with security and performance best practices
 
 # Stage 1: Builder - Install dependencies
-FROM python:3.13-slim as builder
+FROM python:3.13-slim-bookworm as builder
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Configure apt for better reliability
+RUN echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::http::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::ftp::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries
+
+# Install system dependencies with retry logic
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get update --fix-missing && \
+    apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
@@ -26,12 +34,20 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -e .
 
 # Stage 2: Runtime - Minimal production image
-FROM python:3.13-slim
+FROM python:3.13-slim-bookworm
 
 WORKDIR /app
 
-# Install runtime dependencies only
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Configure apt for better reliability
+RUN echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::http::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::ftp::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries
+
+# Install runtime dependencies only with retry logic
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get update --fix-missing && \
+    apt-get install -y --no-install-recommends \
     libpq5 \
     curl \
     && rm -rf /var/lib/apt/lists/*
