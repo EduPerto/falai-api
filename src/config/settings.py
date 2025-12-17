@@ -108,10 +108,17 @@ class Settings(BaseSettings):
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
 
     # CORS settings
-    CORS_ORIGINS: List[str] = os.getenv(
+    CORS_ORIGINS: str = os.getenv(
         "CORS_ORIGINS",
         "https://falai.3du.space,http://localhost:3200,http://localhost:3000"
-    ).split(",")
+    )
+
+    @property
+    def cors_origins_list(self) -> List[str]:
+        """Parse CORS_ORIGINS string into a list"""
+        if isinstance(self.CORS_ORIGINS, str):
+            return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+        return self.CORS_ORIGINS
 
     # Token settings
     TOKEN_EXPIRY_HOURS: int = int(
