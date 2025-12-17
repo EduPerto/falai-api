@@ -1,19 +1,20 @@
 # syntax=docker/dockerfile:1
 
-# Stage 1: Builder - Instala dependências e compila
-# Usamos 'bookworm' explicitamente para garantir estabilidade (evita repositórios instáveis)
+# Stage 1: Builder
 FROM python:3.13-slim-bookworm AS builder
 
 WORKDIR /app
 
-# Configura o APT para ser mais resiliente a falhas de rede
-RUN echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
+# Configura o APT para ser mais resiliente a falhas de rede (DNS/Timeouts)
+# Removemos o 'docker-clean' para garantir que o cache do APT persista entre builds
+RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
+    echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
     echo 'Acquire::http::Timeout "20";' >> /etc/apt/apt.conf.d/80-retries
 
-# Instala dependências do sistema com Cache Mount
-# O cache em /var/cache/apt acelera builds futuros
+# Instala dependências do sistema
+# CORREÇÃO: Removemos o cache de /var/lib/apt para evitar o erro de "directory missing".
+# Mantemos apenas /var/cache/apt para não baixar os .deb novamente.
 RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt \
     apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libpq-dev
@@ -27,24 +28,24 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Instala dependências Python com Cache Mount do PIP
-# Isso salva muito tempo evitando baixar rodas (wheels) repetidamente
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip && \
     pip install greenlet && \
     pip install -e .
 
-# Stage 2: Runtime - Imagem de produção mínima
+# Stage 2: Runtime
 FROM python:3.13-slim-bookworm
 
 WORKDIR /app
 
-# Configura retries para o APT no estágio final também
-RUN echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries
+# Configurações de rede para o estágio final
+RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
+    echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries
 
 # Instala dependências de runtime
-# O 'rm -rf' é mantido aqui para manter a imagem final pequena
+# Aqui usamos 'rm -rf /var/lib/apt/lists/*' no final para limpar o que foi baixado NESTA camada,
+# mantendo a imagem final leve.
 RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt \
     apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     curl \
@@ -53,7 +54,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 # Copia o venv do builder
 COPY --from=builder /opt/venv /opt/venv
 
-# Copia código da aplicação e scripts
+# Copia código da aplicação
 COPY src ./src
 COPY migrations ./migrations
 COPY alembic.ini ./
@@ -73,7 +74,7 @@ ENV PATH="/opt/venv/bin:$PATH" \
 
 EXPOSE 8000
 
-# Health check (Mantido conforme original)
+# Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8000/ || exit 1
 
