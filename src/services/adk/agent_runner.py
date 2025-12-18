@@ -320,6 +320,7 @@ async def run_agent_stream(
     session_id: Optional[str] = None,
     files: Optional[list] = None,
 ) -> AsyncGenerator[str, None]:
+    exit_stack = None  # Declare exit_stack at function scope for cleanup
     tracer = get_tracer()
     span = tracer.start_span(
         "run_agent_stream",
@@ -543,19 +544,11 @@ async def run_agent_stream(
                     )
 
                     memory_service.add_session_to_memory(completed_session)
+
+                    logger.info("Agent streaming execution completed successfully")
                 except Exception as e:
                     logger.error(f"Error processing request: {str(e)}")
                     raise InternalServerError(str(e)) from e
-                finally:
-                    # Clean up MCP connection
-                    if exit_stack:
-                        logger.info("Closing MCP server connection...")
-                        try:
-                            await exit_stack.aclose()
-                        except Exception as e:
-                            logger.error(f"Error closing MCP connection: {e}")
-
-                logger.info("Agent streaming execution completed successfully")
             except AgentNotFoundError as e:
                 logger.error(f"Error processing request: {str(e)}")
                 raise InternalServerError(str(e)) from e
@@ -565,4 +558,13 @@ async def run_agent_stream(
                 )
                 raise InternalServerError(str(e))
     finally:
+        # Clean up MCP connection
+        if exit_stack:
+            logger.info("Closing MCP server connection...")
+            try:
+                await exit_stack.aclose()
+            except Exception as e:
+                # Suppress context errors during cleanup
+                if "was created in a different Context" not in str(e):
+                    logger.error(f"Error closing MCP connection: {e}")
         span.end()
