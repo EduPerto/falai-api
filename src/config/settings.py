@@ -63,11 +63,12 @@ def parse_redis_config():
         }
 
     # Use individual environment variables
+    redis_port = os.getenv("REDIS_PORT", "6379")
     return {
-        "host": os.getenv("REDIS_HOST", "localhost"),
-        "port": int(os.getenv("REDIS_PORT", "6379")),
-        "password": os.getenv("REDIS_PASSWORD"),
-        "db": int(redis_db_env) if redis_db_env.isdigit() else 0,
+        "host": os.getenv("REDIS_HOST", "localhost") or "localhost",
+        "port": int(redis_port) if redis_port and redis_port.isdigit() else 6379,
+        "password": os.getenv("REDIS_PASSWORD") or None,
+        "db": int(redis_db_env) if redis_db_env and redis_db_env.isdigit() else 0,
         "ssl": os.getenv("REDIS_SSL", "false").lower() == "true"
     }
 
