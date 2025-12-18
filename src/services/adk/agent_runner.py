@@ -352,7 +352,40 @@ async def run_agent_stream(
 
                 # Using the AgentBuilder to create the agent
                 agent_builder = AgentBuilder(db)
-                root_agent, exit_stack = await agent_builder.build_agent(get_root_agent)
+                try:
+                    root_agent, exit_stack = await agent_builder.build_agent(get_root_agent)
+                except ValueError as e:
+                    logger.error(f"Failed to build agent: {str(e)}", exc_info=True)
+                    error_message = {
+                        "type": "error",
+                        "content": {
+                            "role": "agent",
+                            "parts": [
+                                {
+                                    "type": "text",
+                                    "text": f"Error creating agent: {str(e)}. Please check your agent configuration (model name and API key)."
+                                }
+                            ]
+                        }
+                    }
+                    yield json.dumps(error_message)
+                    return
+                except Exception as e:
+                    logger.error(f"Unexpected error building agent: {str(e)}", exc_info=True)
+                    error_message = {
+                        "type": "error",
+                        "content": {
+                            "role": "agent",
+                            "parts": [
+                                {
+                                    "type": "text",
+                                    "text": f"Unexpected error creating agent: {str(e)}"
+                                }
+                            ]
+                        }
+                    }
+                    yield json.dumps(error_message)
+                    return
 
                 logger.info("Configuring Runner")
                 agent_runner = Runner(
