@@ -6,7 +6,12 @@ FROM python:3.13-slim-bookworm AS builder
 WORKDIR /app
 
 # Instala dependências do sistema (sem cache mount problemático)
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Instala dependências do sistema (com correções de rede)
+RUN echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4 && \
+    echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::http::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries && \
+    sed -i 's/deb.debian.org/ftp.us.debian.org/g' /etc/apt/sources.list.d/debian.sources && \
+    apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
@@ -31,7 +36,12 @@ FROM python:3.13-slim-bookworm
 WORKDIR /app
 
 # Instala dependências de runtime (sem cache mount)
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Instala dependências de runtime (com correções de rede)
+RUN echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4 && \
+    echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::http::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries && \
+    sed -i 's/deb.debian.org/ftp.us.debian.org/g' /etc/apt/sources.list.d/debian.sources && \
+    apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     curl \
     && rm -rf /var/lib/apt/lists/*
