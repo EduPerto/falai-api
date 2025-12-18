@@ -32,9 +32,44 @@ from typing import Optional, List
 from pydantic_settings import BaseSettings
 import secrets
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 # Load environment variables
 load_dotenv()
+
+
+def parse_redis_config():
+    """Parse Redis configuration from environment variables.
+
+    Supports both individual variables (REDIS_HOST, REDIS_PORT, etc.)
+    and a complete REDIS_URL.
+    """
+    redis_url = os.getenv("REDIS_URL")
+    redis_db_env = os.getenv("REDIS_DB", "0")
+
+    # Check if REDIS_DB contains a URL (Railway sets this incorrectly)
+    if redis_db_env.startswith("redis://") or redis_db_env.startswith("rediss://"):
+        redis_url = redis_db_env
+
+    if redis_url and (redis_url.startswith("redis://") or redis_url.startswith("rediss://")):
+        # Parse Redis URL
+        parsed = urlparse(redis_url)
+        return {
+            "host": parsed.hostname or "localhost",
+            "port": parsed.port or 6379,
+            "password": parsed.password,
+            "db": int(parsed.path.lstrip("/")) if parsed.path and parsed.path != "/" else 0,
+            "ssl": parsed.scheme == "rediss"
+        }
+
+    # Use individual environment variables
+    return {
+        "host": os.getenv("REDIS_HOST", "localhost"),
+        "port": int(os.getenv("REDIS_PORT", "6379")),
+        "password": os.getenv("REDIS_PASSWORD"),
+        "db": int(redis_db_env) if redis_db_env.isdigit() else 0,
+        "ssl": os.getenv("REDIS_SSL", "false").lower() == "true"
+    }
 
 
 class Settings(BaseSettings):
@@ -64,12 +99,13 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     LOG_DIR: str = "logs"
 
-    # Redis settings
-    REDIS_HOST: str = os.getenv("REDIS_HOST", "localhost")
-    REDIS_PORT: int = int(os.getenv("REDIS_PORT", 6379))
-    REDIS_DB: int = int(os.getenv("REDIS_DB", 0))
-    REDIS_PASSWORD: Optional[str] = os.getenv("REDIS_PASSWORD")
-    REDIS_SSL: bool = os.getenv("REDIS_SSL", "false").lower() == "true"
+    # Redis settings - parsed from REDIS_URL or individual variables
+    _redis_config = parse_redis_config()
+    REDIS_HOST: str = _redis_config["host"]
+    REDIS_PORT: int = _redis_config["port"]
+    REDIS_DB: int = _redis_config["db"]
+    REDIS_PASSWORD: Optional[str] = _redis_config["password"]
+    REDIS_SSL: bool = _redis_config["ssl"]
     REDIS_KEY_PREFIX: str = os.getenv("REDIS_KEY_PREFIX", "evoai:")
     REDIS_TTL: int = int(os.getenv("REDIS_TTL", 3600))
 
