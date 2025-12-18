@@ -78,8 +78,8 @@ POSTGRES_CONNECTION_STRING = os.getenv(
     "POSTGRES_CONNECTION_STRING", "postgresql://postgres:root@localhost:5432/evo_ai"
 )
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
+# Create database tables (checkfirst=True avoids errors if tables already exist)
+Base.metadata.create_all(bind=engine, checkfirst=True)
 
 API_PREFIX = "/api/v1"
 
