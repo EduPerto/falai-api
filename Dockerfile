@@ -5,15 +5,19 @@ FROM python:3.13-slim-bookworm AS builder
 
 WORKDIR /app
 
-# Instala dependências do sistema (sem cache mount problemático)
-# Instala dependências do sistema (com correções de rede)
-RUN echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4 && \
-    echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
-    echo 'Acquire::http::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries && \
-    sed -i 's/deb.debian.org/ftp.us.debian.org/g' /etc/apt/sources.list.d/debian.sources && \
-    apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    libpq-dev \
+# Install system dependencies with multiple mirror fallbacks
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    # Try standard mirror first
+    (apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev) || \
+    # Fallback 1: US mirror
+    (echo "deb http://ftp.us.debian.org/debian bookworm main" > /etc/apt/sources.list && \
+     echo "deb http://ftp.us.debian.org/debian bookworm-updates main" >> /etc/apt/sources.list && \
+     echo "deb http://security.debian.org/debian-security bookworm-security main" >> /etc/apt/sources.list && \
+     apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev) || \
+    # Fallback 2: Cloudflare mirror
+    (echo "deb http://deb.debian.org/debian bookworm main" > /etc/apt/sources.list && \
+     apt-get -o Acquire::http::Proxy="false" update && \
+     apt-get install -y --no-install-recommends gcc libpq-dev) \
     && rm -rf /var/lib/apt/lists/*
 
 # Copia arquivos de dependência
@@ -35,15 +39,19 @@ FROM python:3.13-slim-bookworm
 
 WORKDIR /app
 
-# Instala dependências de runtime (sem cache mount)
-# Instala dependências de runtime (com correções de rede)
-RUN echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4 && \
-    echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries && \
-    echo 'Acquire::http::Timeout "30";' >> /etc/apt/apt.conf.d/80-retries && \
-    sed -i 's/deb.debian.org/ftp.us.debian.org/g' /etc/apt/sources.list.d/debian.sources && \
-    apt-get update && apt-get install -y --no-install-recommends \
-    libpq5 \
-    curl \
+# Install runtime dependencies with multiple mirror fallbacks
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    # Try standard mirror first
+    (apt-get update && apt-get install -y --no-install-recommends libpq5 curl) || \
+    # Fallback 1: US mirror
+    (echo "deb http://ftp.us.debian.org/debian bookworm main" > /etc/apt/sources.list && \
+     echo "deb http://ftp.us.debian.org/debian bookworm-updates main" >> /etc/apt/sources.list && \
+     echo "deb http://security.debian.org/debian-security bookworm-security main" >> /etc/apt/sources.list && \
+     apt-get update && apt-get install -y --no-install-recommends libpq5 curl) || \
+    # Fallback 2: Cloudflare mirror
+    (echo "deb http://deb.debian.org/debian bookworm main" > /etc/apt/sources.list && \
+     apt-get -o Acquire::http::Proxy="false" update && \
+     apt-get install -y --no-install-recommends libpq5 curl) \
     && rm -rf /var/lib/apt/lists/*
 
 # Copia o venv do builder
