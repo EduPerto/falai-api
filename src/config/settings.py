@@ -28,8 +28,9 @@
 """
 
 import os
-from typing import Optional, List
+from typing import Optional, List, Any, Dict
 from pydantic_settings import BaseSettings
+from pydantic import model_validator
 import secrets
 from dotenv import load_dotenv
 from urllib.parse import urlparse
@@ -100,13 +101,12 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     LOG_DIR: str = "logs"
 
-    # Redis settings - parsed from REDIS_URL or individual variables
-    _redis_config = parse_redis_config()
-    REDIS_HOST: str = _redis_config["host"]
-    REDIS_PORT: int = _redis_config["port"]
-    REDIS_DB: int = _redis_config["db"]
-    REDIS_PASSWORD: Optional[str] = _redis_config["password"]
-    REDIS_SSL: bool = _redis_config["ssl"]
+    # Redis settings - will be populated by model_validator
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_DB: int = 0
+    REDIS_PASSWORD: Optional[str] = None
+    REDIS_SSL: bool = False
     REDIS_KEY_PREFIX: str = os.getenv("REDIS_KEY_PREFIX", "evoai:")
     REDIS_TTL: int = int(os.getenv("REDIS_TTL", 3600))
 
@@ -180,6 +180,19 @@ class Settings(BaseSettings):
     LANGFUSE_PUBLIC_KEY: str = os.getenv("LANGFUSE_PUBLIC_KEY", "")
     LANGFUSE_SECRET_KEY: str = os.getenv("LANGFUSE_SECRET_KEY", "")
     OTEL_EXPORTER_OTLP_ENDPOINT: str = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "")
+
+    @model_validator(mode='before')
+    @classmethod
+    def parse_redis_settings(cls, data: Any) -> Any:
+        """Parse Redis configuration before Pydantic validation."""
+        if isinstance(data, dict):
+            redis_config = parse_redis_config()
+            data['REDIS_HOST'] = redis_config['host']
+            data['REDIS_PORT'] = redis_config['port']
+            data['REDIS_DB'] = redis_config['db']
+            data['REDIS_PASSWORD'] = redis_config['password']
+            data['REDIS_SSL'] = redis_config['ssl']
+        return data
 
     class Config:
         env_file = ".env"
