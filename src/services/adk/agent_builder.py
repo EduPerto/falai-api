@@ -170,16 +170,27 @@ class AgentBuilder:
                     f"Agent {agent.name} does not have a configured API key"
                 )
 
-        return (
-            LlmAgent(
+        try:
+            logger.info(f"Creating LiteLLM model with: model={agent.model}, api_key={'***' + api_key[-4:] if api_key and len(api_key) > 4 else 'None'}")
+
+            lite_llm_model = LiteLlm(model=agent.model, api_key=api_key)
+
+            logger.info(f"Creating LlmAgent: {agent.name}")
+            llm_agent = LlmAgent(
                 name=agent.name,
-                model=LiteLlm(model=agent.model, api_key=api_key),
+                model=lite_llm_model,
                 instruction=formatted_prompt,
                 description=agent.description,
                 tools=all_tools,
-            ),
-            mcp_exit_stack,
-        )
+            )
+
+            logger.info(f"LlmAgent created successfully: {agent.name}")
+
+            return (llm_agent, mcp_exit_stack)
+        except Exception as e:
+            logger.error(f"Error creating LLM agent {agent.name}: {str(e)}", exc_info=True)
+            logger.error(f"Model: {agent.model}, API Key present: {bool(api_key)}")
+            raise ValueError(f"Failed to create LLM agent: {str(e)}") from e
 
     async def _get_sub_agents(
         self, sub_agent_ids: List[str]
